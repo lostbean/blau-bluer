@@ -18,11 +18,7 @@ M109 S195
 M82 ;absolute extrusion mode
 ; Two Trees Bluer Custom Start G-code
 G28 ;Home
-
-; Either do bed levelling at start or restore ABL mesh
 G29 ; probe bed
-; M420 S1 ; restore ABL mesh
-
 G92 E0 ;Reset Extruder
 G1 Z4.0 F3000 ;Move Z Axis up
 G1 E10 F1500 ;Purge a bit

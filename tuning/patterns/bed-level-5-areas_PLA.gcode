@@ -9,7 +9,6 @@ M104 S200 T0 ; custom hot end temp
 M109 S200 T0 ; custom hot end temp
 G28 ; home all axes
 G29 ; probe ABL
-;M420 S1 ; restore ABL mesh 
 ;customstart
 ; process Color1
 ; layer 1, Z = 0.200
