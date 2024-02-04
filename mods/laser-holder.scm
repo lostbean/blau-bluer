@@ -87,6 +87,36 @@
 
 
 
+(define exhaust-dute (let* (
+  (inlet-r 1.2)
+  (outlet-r 0.95)
+  (insertion-y 0.05)
+  (cone-z 4)
+  (outlet-z 2)
+  (shell-thickness 0.2)
+  (inlet (intersection
+    (circle inlet-r)
+    (rectangle-centered-exact [inlet-r (* inlet-r 2)] [(/ inlet-r 2) 0])))
+  (outlet (circle outlet-r))
+)
+  (difference
+    (shell
+        (union
+        (extrude-z outlet cone-z (+ cone-z outlet-z))
+        (loft (circle inlet-r) outlet 0 cone-z)
+        (rotate-y (extrude-z inlet 0 (+ inlet-r insertion-y)) 90deg)
+      ) shell-thickness)
+    (rotate-y (extrude-z (offset inlet (- shell-thickness)) 0 (+ 1 inlet-r insertion-y)) 90deg)
+    (extrude-z (offset outlet (- shell-thickness)) (- cone-z 1) (+ 1 cone-z outlet-z))
+  )
+))
+
+(difference exhaust-dute
+
+(extrude-z (shell (circle 2.5) 0.8) 0 4)
+)
+
+
 (define motor-holes (cylinder-z 0.2505 2 [0 0 -1]))
 (define cup-screw-holes (union
   (cylinder-z 0.3 1 [0 0 0])
