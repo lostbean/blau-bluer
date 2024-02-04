@@ -8,10 +8,13 @@
 (define wall-thickness 0.4)
 (define back-wall-thickness (* wall-thickness 2))
 
-(define motor-dia 4.5)
-(define motor-ring-dia 1.8)
+(define laser-cover-xy 4.03)
+(define laser-cover-xy-base 4.13)
+(define laser-cover-z 3.8)
+(define laser-base-screew-z (+ 4.0 laser-cover-z))
+(define laser-screew-x (/ 2.4 2))
 
-(define holder-dia (+ motor-dia wall-thickness wall-thickness))
+(define holder-dia (+ laser-cover-xy-base wall-thickness))
 (define holder-hegiht back-wall-thickness)
 (define backplate-height 6.2)
 
@@ -19,19 +22,23 @@
 (define plate-groove 0.5)
 (define plate-lenght 2.5)
 
-(define laser-xy 4.03)
-(define laser-cover-z 3.8)
-(define laser-base-screew-z (+ 4.0 laser-cover-z))
-(define laser-screew-x (/ 2.4 2))
 
 (define sensor-r (/ 1.9 2))
 (define sensor-outer-r (/ 3.2 2))
+
+(define exhaust-inlet-r 1.2)
+(define exhaust-outlet-r 0.95)
+(define exhaust-insertion-y wall-thickness)
+(define exhaust-cone-z 4)
+(define exhaust-outlet-z 2)
+(define dute-thickness 0.2)
 
 (define 90deg (/ pi 2))
 (define 45deg (/ pi 5))
 
 (define clip-y (+ plate-thickness wall-thickness))
-(define laser-holder-outer-len (+ laser-xy wall-thickness))
+(define laser-holder-outer-len (+ laser-cover-xy wall-thickness))
+(define laser-holder-outer-len (+ laser-cover-xy wall-thickness))
 
 
 
@@ -55,75 +62,71 @@
 (define backplate (let*
   ((total-z (+ laser-base-screew-z 1)))                        
   (union
+    back-clip
     (move
       (box-centered [holder-dia back-wall-thickness total-z])
       [0 (+ clip-y (/ back-wall-thickness 2)) (/ total-z 2)]))))
 
+
 (define motor-cup (let*
   (
-    (inner laser-xy)
-    (inner-base (+ inner 1))
-    (outter-base holder-dia)
-    (outter (- outter-base wall-thickness))
-    (cup-z (+ back-wall-thickness laser-cover-z)))
-  (move
-    (intersection
-      (difference
+    (inner laser-cover-xy)
+    (inner-base laser-cover-xy-base)
+    (outter (+ inner wall-thickness))
+    (outter-base (+ inner-base wall-thickness))
+    (cup-z (+ back-wall-thickness laser-cover-z))
+    (mask
+      (move
+        (extrude-z
+            (rotate-x (rectangle-centered-exact [outter-base outter-base]) (- 45deg))
+        (- cup-z) 0)
+      [0 (/ (- (/ laser-holder-outer-len 2) back-wall-thickness) -6) cup-z]))
+
+    (inlet (intersection
+      (circle exhaust-inlet-r)
+      (rectangle-centered-exact [exhaust-inlet-r (* exhaust-inlet-r 2)] [(/ exhaust-inlet-r 2) 0])))
+    (outlet (circle exhaust-outlet-r))
+    (exhaust-dute
+        (shell
+            (union
+              (extrude-z outlet exhaust-cone-z (+ exhaust-cone-z exhaust-outlet-z))
+              (loft (circle exhaust-inlet-r) outlet 0 exhaust-cone-z)
+              (rotate-y (extrude-z inlet 0 (+ exhaust-inlet-r exhaust-insertion-y)) 90deg)
+          ) dute-thickness)
+    )
+    (inlet-cutout (rotate-y (extrude-z (offset inlet (- dute-thickness)) 0 (+ 1 exhaust-inlet-r exhaust-insertion-y)) 90deg))
+    (outlet-cutout (extrude-z (offset outlet (- dute-thickness)) (- exhaust-cone-z 1) (+ 1 exhaust-cone-z exhaust-outlet-z)))
+    (dute-move [(+ (/ outter-base 2) exhaust-outlet-r dute-thickness) 0 0])
+    (cup-move [0 (+ back-wall-thickness clip-y (/ inner 2)) ])
+    (cover-cutout
+      (loft
+        (rectangle-centered-exact [inner-base inner-base])
+        (rectangle-centered-exact [inner inner])
+        0 cup-z))
+  )
+
+  (difference
+    (union
+      backplate
+      sensor-holder
+      (move (move exhaust-dute dute-move) cup-move)
+      (move (intersection
+        mask
         (loft
           (rectangle-centered-exact [outter-base outter-base])
           (rectangle-centered-exact [outter outter])
-          0 cup-z)
-        (loft
-          (rectangle-centered-exact [inner-base inner-base])
-          (rectangle-centered-exact [inner inner])
-          0 cup-z))
-      (move
-        (extrude-z
-          (rotate-x (rectangle-centered-exact [outter-base outter-base]) (- 45deg))
-        (- cup-z) 0)
-      [0 (/ (- (/ laser-holder-outer-len 2) back-wall-thickness) -6) cup-z])
-  )                                                                                                                                                         
-  [0 (+ back-wall-thickness clip-y (/ inner 2)) ])))
-
-
-
-(define exhaust-dute (let* (
-  (inlet-r 1.2)
-  (outlet-r 0.95)
-  (insertion-y 0.05)
-  (cone-z 4)
-  (outlet-z 2)
-  (shell-thickness 0.2)
-  (inlet (intersection
-    (circle inlet-r)
-    (rectangle-centered-exact [inlet-r (* inlet-r 2)] [(/ inlet-r 2) 0])))
-  (outlet (circle outlet-r))
-)
-  (difference
-    (shell
-        (union
-        (extrude-z outlet cone-z (+ cone-z outlet-z))
-        (loft (circle inlet-r) outlet 0 cone-z)
-        (rotate-y (extrude-z inlet 0 (+ inlet-r insertion-y)) 90deg)
-      ) shell-thickness)
-    (rotate-y (extrude-z (offset inlet (- shell-thickness)) 0 (+ 1 inlet-r insertion-y)) 90deg)
-    (extrude-z (offset outlet (- shell-thickness)) (- cone-z 1) (+ 1 cone-z outlet-z))
-  )
-))
-
-(difference exhaust-dute
-
-(extrude-z (shell (circle 2.5) 0.8) 0 4)
-)
-
+          0 cup-z)) cup-move))
+  (move cover-cutout cup-move)
+  (move (move inlet-cutout dute-move) cup-move)
+  (move (move outlet-cutout dute-move) cup-move))))
 
 (define motor-holes (cylinder-z 0.2505 2 [0 0 -1]))
 (define cup-screw-holes (union
   (cylinder-z 0.3 1 [0 0 0])
   (cylinder-z 0.15 1 [0 0 -1])))
 
-(difference (move (union backplate motor-cup back-clip sensor-holder) [0 0 (/ plate-groove -2)])
+(difference (move motor-cup [0 0 (/ plate-groove -2)])
   (symmetric-x (move (rotate-x motor-holes (- 90deg)) [laser-screew-x 1 (+ laser-base-screew-z (/ plate-groove -2))]))
   (symmetric-x (move (rotate-x cup-screw-holes (- 90deg)) [1 (+ clip-y (/ back-wall-thickness 2)) 5.4]))
   (move (rotate-x (cylinder-z 0.5 1) 90deg) [0 (+ clip-y 0.6) 1.5])                                                                          
-  (symmetric-x (move (rotate-y (scale-z (rotate-x (cylinder-z 1.2 4) 90deg) 1.4) -0.3) [2.8 3 6.1])))
+  (symmetric-x (move (rotate-y (scale-z (rotate-x (cylinder-z 1.2 2) 90deg) 1.4) -0.3) [2.8 2 6.1])))
