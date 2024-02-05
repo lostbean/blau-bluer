@@ -26,12 +26,12 @@
 (define sensor-r (/ 1.9 2))
 (define sensor-outer-r (/ 3.2 2))
 
-(define exhaust-inlet-r 1.2)
+(define dute-thickness 0.2)
+(define exhaust-inlet-r (+ 1.2 dute-thickness))
 (define exhaust-outlet-r 0.95)
 (define exhaust-insertion-y wall-thickness)
 (define exhaust-cone-z 4)
 (define exhaust-outlet-z 2)
-(define dute-thickness 0.2)
 
 (define blast-outlet-r 0.3)
 (define blast-inlet-r 0.95)
@@ -96,9 +96,17 @@
     (exhaust-dute
         (shell
             (union
+              ;; tube outlet
               (extrude-z outlet exhaust-cone-z (+ exhaust-cone-z exhaust-outlet-z))
+              ;; cone
               (loft (circle exhaust-inlet-r) outlet 0 exhaust-cone-z)
+              ;; air intake an the cover side
               (rotate-y (extrude-z inlet 0 (+ exhaust-inlet-r exhaust-insertion-y)) 90deg)
+              ;; support
+              (extrude-z
+                (rectangle-centered-exact [(- (+ exhaust-inlet-r exhaust-insertion-y) exhaust-outlet-r) 0.3] [(- exhaust-inlet-r) 0])
+                exhaust-outlet-r laser-cover-z)
+                
           ) dute-thickness)
     )
     (inlet-cutout (rotate-y (extrude-z (offset inlet (- dute-thickness)) 0 (+ 1 exhaust-inlet-r exhaust-insertion-y)) 90deg))
@@ -120,7 +128,9 @@
     
     (blast
       (union
+        ;; Upper tube - inlet
         (extrude-z (ring blast-inlet-outer-r blast-inlet-inner-r) blast-cone-z (+ blast-cone-z blast-inlet-z))
+        ;; middle cone
         (difference
           (loft
             (move (circle blast-outlet-outer-r) blast-outlet-shift)
@@ -129,8 +139,10 @@
           (loft
             (move (circle blast-outlet-inner-r) blast-outlet-shift)
             (circle blast-inlet-inner-r)
-            0 blast-cone-z))      
+            0 blast-cone-z))
+        ;; Lower tube - outlet
         (move (extrude-z (ring blast-outlet-outer-r blast-outlet-inner-r) (- 0 blast-outlet-z) 0) blast-outlet-shift)
+        ;; Support
         (move 
           (extrude-z
             (rectangle-centered-exact [(* wall-thickness 2) blast-wall-to-inner-tube])
@@ -138,12 +150,12 @@
         [0 (- (+ blast-inlet-inner-r (/ blast-wall-to-inner-tube 2)))])
       )
     )
-    
+    (blast-move [0 (+ blast-wall-to-inner-tube inner blast-inlet-outer-r clip-y back-wall-thickness (/ wall-thickness -2)) laser-cover-z])
   )
 
   (difference
     (union
-      (move blast [0 (+ blast-wall-to-inner-tube inner blast-inlet-outer-r clip-y back-wall-thickness (/ wall-thickness -2)) laser-cover-z])
+      (move blast blast-move)
       backplate
       sensor-holder
       (move (move exhaust-dute dute-move) cup-move)
