@@ -9,7 +9,7 @@
 
 (define board-holes-r 1.2)
 (define board-hole-base-r 5)
-(define board-support-z 38)
+(define board-support-z 33)
 (define board-support-inset-base-r 2.5)
 (define board-support-inset-base-z 11)
 (define board-support-inset-z 2)
@@ -26,14 +26,13 @@
 (define support-sq-base-x (- box-inner-x board-holes-x))
 (define support-sq-base-y (- box-inner-y board-holes-y))
 
-(define flat-cable-gap-z 1)
+(define flat-cable-wall-z 5)
 (define flat-cable-width 16)
 (define flat-cable-lenght 45)
 
 (define cam-holder-xy 32)
-(define cam-holder- 32)
 
-(define bar-xy 20)
+(define bar-xy 20.5)
 
 (define 90deg (* 90 (/ pi 180)))
 
@@ -62,7 +61,13 @@
     (extrude-z base-rect 0 wall-th))
 
   (box-tube
-    (move (rotate-y (extrude-z (rectangle-centered-exact [(+ bar-xy wall-th wall-th) (+ bar-xy wall-th wall-th)]) (/ box-x -2) (/ box-x 2)) 90deg) [0 0 (/ (+ bar-xy wall-th wall-th) 2)]))
+    (move
+      (rotate-y
+        (extrude-z
+          (rectangle-centered-exact [(+ bar-xy wall-th) (+ bar-xy wall-th wall-th)])
+        (/ box-x -2) (/ box-x 2))
+      90deg)
+    [0 0 (/ (+ bar-xy wall-th) 2)]))
   
   (cover
     (union
@@ -83,16 +88,16 @@
     (flat-cable
       (move
          (difference
-          (extrude-z (offset cam-arm wall-th) 0 (* 2 wall-th))
-          (extrude-z cam-arm wall-th (* 2 wall-th))
+          (extrude-z (offset cam-arm wall-th) 0 (+ flat-cable-wall-z wall-th))
+          (extrude-z cam-arm wall-th (+ flat-cable-wall-z wall-th))
          )
       [0 (/(+ flat-cable-lenght box-y) 2) 0]))
     
     (flat-cable-cover
       (move
          (difference
-          (extrude-z (offset cam-arm (* 2 wall-th)) 0 (* 3 wall-th))
-          (extrude-z (offset cam-arm wall-th) 0 (* 2 wall-th))
+          (extrude-z (offset cam-arm (* 2 wall-th)) 0 (+ flat-cable-wall-z wall-th wall-th))
+          (extrude-z (offset cam-arm wall-th) 0 (+ flat-cable-wall-z wall-th))
          )
       [0 (/(+ flat-cable-lenght box-y) 2) 0]))
 
@@ -127,8 +132,8 @@
       box-side
       box-tube
       supports
-      (move flat-cable-cover [0 5 15])
-      (move cover [0 0 30])
+      ; (move flat-cable-cover [0 5 15])
+      ; (move cover [0 0 30])
     )
   cuts))
 
