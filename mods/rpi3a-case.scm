@@ -28,7 +28,7 @@
 
 (define flat-cable-wall-z 5)
 (define flat-cable-width 16)
-(define flat-cable-lenght 45)
+(define flat-cable-length 35)
 
 (define cam-holder-xy 32)
 
@@ -82,8 +82,8 @@
 
     (cam-arm
       (union
-        (rectangle-centered-exact [flat-cable-width flat-cable-lenght])
-        (rectangle-centered-exact [cam-holder-xy cam-holder-xy] [0 (/ (+ flat-cable-lenght cam-holder-xy) 2)])))
+        (rectangle-centered-exact [flat-cable-width flat-cable-length])
+        (rectangle-centered-exact [cam-holder-xy cam-holder-xy] [0 (/ (+ flat-cable-length cam-holder-xy) 2)])))
 
     (flat-cable
       (move
@@ -91,7 +91,7 @@
           (extrude-z (offset cam-arm wall-th) 0 (+ flat-cable-wall-z wall-th))
           (extrude-z cam-arm wall-th (+ flat-cable-wall-z wall-th))
          )
-      [0 (/(+ flat-cable-lenght box-y) 2) 0]))
+      [0 (/(+ flat-cable-length box-y) 2) 0]))
     
     (flat-cable-cover
       (move
@@ -99,7 +99,7 @@
           (extrude-z (offset cam-arm (* 2 wall-th)) 0 (+ flat-cable-wall-z wall-th wall-th))
           (extrude-z (offset cam-arm wall-th) 0 (+ flat-cable-wall-z wall-th))
          )
-      [0 (/(+ flat-cable-lenght box-y) 2) 0]))
+      [0 (/(+ flat-cable-length box-y) 2) 0]))
 
     (cuts
       (union
@@ -108,33 +108,36 @@
           (rectangle-centered-exact [flat-cable-width 10] [0 (/(+ box-y) 2) wall-th]) wall-th (* 2 wall-th))
         ;;cam hole
         (extrude-z
-          (rectangle-centered-exact [24 17.5] [0 (/ (+ box-y flat-cable-lenght flat-cable-lenght cam-holder-xy) 2)]) 0 wall-th)
+          (rectangle-centered-exact [24 17.5] [0 (/ (+ box-y flat-cable-length flat-cable-length cam-holder-xy) 2)]) 0 wall-th)
         ;; hdmi hole
-        (move (rotate-x (extrude-z (rectangle-centered-exact [16 8]) (- wall-th) wall-th) 90deg) [-0.5 (/ box-y -2) (- board-support-z 4)])
+        (move (rotate-x (extrude-z (rectangle-centered-exact [16 8]) (- wall-th) wall-th) 90deg) [-1 (/ box-y -2) (- board-support-z 3)])
         ;; micro usb hole
-        (move (rotate-x (extrude-z (rectangle-centered-exact [9 4]) (- wall-th) wall-th) 90deg) [22 (/ box-y -2) (- board-support-z 2)])
+        (move (rotate-x (extrude-z (rectangle-centered-exact [9 4]) (- wall-th) wall-th) 90deg) [22 (/ box-y -2) (- board-support-z 1)])
         ;; audio jack hole
-        (move (rotate-x (extrude-z (circle 3.5) (- wall-th) wall-th) 90deg) [-21 (/ box-y -2) (- board-support-z 3.5)])
+        (move (rotate-x (extrude-z (circle 3.5) (- wall-th) wall-th) 90deg) [-21 (/ box-y -2) (- board-support-z 2.5)])
         ;; USB hole
-        (move (rotate-y (extrude-z (rectangle-centered-exact [9 15]) (- wall-th) wall-th) 90deg) [(/ box-x -2) 3.45 (- board-support-z 4.5)])
+        (move (rotate-y (extrude-z (rectangle-centered-exact [9 15]) (- wall-th) wall-th) 90deg) [(/ box-x -2) 3.45 (- board-support-z 3.5)])
         ;; sd card hole
-        (move (rotate-y (extrude-z (rectangle-centered-exact [3 12]) (- wall-th) wall-th) 90deg) [(/ box-x 2) 0 (+ board-support-z 1)])
+        (move (rotate-y (extrude-z (rectangle-centered-exact [3 12]) (- wall-th) wall-th) 90deg) [(/ box-x 2) 0 (+ board-support-z 2)])
         ;; bar groove 
         (move (rotate-y (extrude-z (rectangle-centered-exact [(* bar-xy 2) bar-xy]) (- box-x) box-x) 90deg) [0 0 0])
     ))
-    
+                                                                                                                                           
+    (full-case
+      (difference
+        (union
+          flat-cable
+          box-base
+          box-side
+          box-tube
+          supports)
+      cuts))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
   ) 
-  
-  (difference
-    (union
-      flat-cable
-      box-base
-      box-side
-      box-tube
-      supports
-      ; (move flat-cable-cover [0 5 15])
-      ; (move cover [0 0 30])
-    )
-  cuts))
+  (union
+    full-case
+    ; (move flat-cable-cover [0 5 15])
+    (move cover [0 0 30])
+  )
+)
 
 
