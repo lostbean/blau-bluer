@@ -13,6 +13,9 @@ https://github.com/lostbean/Marlin
 - `tuning/` — bed-leveling and calibration material: gcode patterns
   (`patterns/`), test models (`models/`, mostly `.scm`/`.stl` plus one
   parametric OpenSCAD source), and reference docs (`docs/`).
+- `PCB/` — guide and configs for making PCBs with the printer's drill mod:
+  pcb2gcode configs (`.cfg`) and G-code pre/postambles (`.ngc`). The
+  calibrated pen→drill offset lives in `preamble_for_drill.ngc`.
 - `Cura/` — Cura printer definition, material profiles, and a project
   template.
 - `ICESL/` — IceSL slicer settings (machine-generated Lua, exported from

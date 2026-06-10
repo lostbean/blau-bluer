@@ -1,0 +1,10 @@
+( Pen-to-drill offset: the X/Y values below come from the calibration )
+( procedure in README.md and are specific to the current holder setup. )
+(MSG, Resetting tool coordinates to current position.)
+M0      (Moving to drilling position.)
+G04 P0 ( dwell for no time -- G64 should not smooth over this point )
+G00 X36.80 Y16.90 Z10
+
+(MSG, Resetting tool coordinates to current position.)
+M0      (Adjust Z position.)
+G92 X0 Y0 Z0

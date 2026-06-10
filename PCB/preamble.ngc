@@ -1,0 +1,10 @@
+(MSG, Resetting tool coordinates to current position.)
+M0      (Move pen to home position.)
+G92 X0 Y0 Z0
+
+G01 F400
+G01 Z-0.05
+G01 X2.0 Y0.0  ( draw triangular marker to clean the pen tip )
+G01 X0.0 Y2.0  ( draw triangular marker to clean the pen tip )
+G01 X0.0 Y0.0  ( draw triangular marker to clean the pen tip )
+G01 X0.0 Y0.0 Z0.0  ( move back to home )
