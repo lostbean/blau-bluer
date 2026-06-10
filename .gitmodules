@@ -1,3 +1,0 @@
-[submodule "Marlin"]
-	path = Marlin
-	url = git@github.com:lostbean/Marlin.git
