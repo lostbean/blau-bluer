@@ -1,0 +1,11 @@
+( Laser workflow: paint is removed by laser, not pen, so there is NO )
+( pen-to-drill offset. The board edge is etched away, so alignment is )
+( to a copper fiducial, not a corner. Mount the drill bit, jog to the )
+( fiducial cross, lower Z until the bit touches it, then resume. The  )
+( post-processor rewrites the G92 below to declare the fiducial's      )
+( position in the part frame (--fiducial), so holes land relative to   )
+( it. Left as 0,0 here for the un-shifted / corner-origin case.        )
+(MSG, Position drill on the fiducial and touch off.)
+M0      (Jog to fiducial, lower bit until it touches, then resume.)
+G04 P0 ( dwell for no time -- G64 should not smooth over this point )
+G92 X0 Y0 Z0
