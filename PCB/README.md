@@ -17,6 +17,16 @@ remaining ink.
 > (`pen-drawing.cfg`, `preamble.ngc`, `preamble_for_drill.ngc`) but the laser
 > flow below is the current one.
 
+> **Drilling now has a browser app.** The manual alignment + pcb2gcode drill
+> flow documented below is superseded for the drill pass by
+> **[blau-drill](https://github.com/lostbean/blau_drill)**, which fits the
+> fiducials into an affine transform (no touch-off `G92`), forces a dry-run
+> before the real run, and streams to the printer over Web Serial. Run it at
+> <https://onedgy.com/lab/blau-drill/>. The design rationale is written up in
+> the post [From Ritual to Software](https://onedgy.com/blog/blau-drill/). The
+> configs below are still the reference for the etch/laser pass and the manual
+> fallback.
+
 This folder holds the printer-specific pieces — the pcb2gcode config with
 tuned feeds and depths, the G-code preamble that handles touch-off and
 zeroing, and a post-processor that adapts pcb2gcode's output to this

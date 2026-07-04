@@ -15,6 +15,14 @@ The printer is adapted to hold a drill spindle and a laser (mounts in
 marker-drawn etch resist plus drilled holes — including the pcb2gcode configs
 and G-code preambles. A laser-based workflow will be added there later.
 
+The alignment-and-drilling half of this now has a browser app,
+**[blau-drill](https://github.com/lostbean/blau_drill)**, that replaces the
+manual pcb2gcode + touch-off flow: it fits the fiducials, gates the dangerous
+moves behind states you have to pass through, and drives the printer directly
+over Web Serial. Try it live at <https://onedgy.com/lab/blau-drill/>; the post
+[From Ritual to Software](https://onedgy.com/blog/blau-drill/) explains why it is
+built the way it is.
+
 ## Contents
 
 - `mods/` — printed mod parts (sources in `.scm`, meshes in `.stl`)
